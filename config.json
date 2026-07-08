@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "name": "Claudia",
+  "description": "AI Assistant with advanced design skills",
+  "api": {
+    "baseUrl": "https://api.tokenlayer.net/",
+    "apiKey": "sk-RD2kgXImmkUN5houAZ9SMTPvkoTQXGxcJQbsuYUIMEezg348",
+    "model": "claude-opus-4-8"
+  },
+  "skills": [
+    "design-taste-frontend-v1",
+    "design-taste-frontend",
+    "brandkit",
+    "full-output-enforcement",
+    "gpt-taste",
+    "high-end-visual-design",
+    "image-to-code",
+    "industrial-brutalist-ui",
+    "minimalist-ui",
+    "redesign-existing-projects",
+    "stitch-design-taste",
+    "imagegen-frontend-mobile",
+    "imagegen-frontend-web"
+  ],
+  "theme": {
+    "accentColor": "#e85d04",
+    "accentColorHover": "#f48c06",
+    "modelBadge": "claude-opus-4-8"
+  }
+}
