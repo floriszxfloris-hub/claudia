@@ -1155,6 +1155,78 @@
       color: var(--accent);
     }
 
+    /* Model Dropdown */
+    .model-dropdown {
+      position: relative;
+    }
+
+    .model-badge svg {
+      width: 12px;
+      height: 12px;
+      transition: transform var(--transition);
+    }
+
+    .model-dropdown.open .model-badge svg {
+      transform: rotate(180deg);
+    }
+
+    .model-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 6px;
+      min-width: 200px;
+      z-index: 500;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .model-dropdown.open .model-menu {
+      display: block;
+    }
+
+    .model-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .model-option:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .model-option.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .model-option .check {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      opacity: 0;
+    }
+
+    .model-option.active .check {
+      opacity: 1;
+    }
+
+    .model-option .check svg {
+      width: 16px;
+      height: 16px;
+    }
+
     /* Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
@@ -1236,9 +1308,32 @@
     <main class="main-content">
       <header class="top-bar">
         <div class="top-bar-left">
-          <div class="model-badge" id="modelBadge">
-            <span class="model-badge-dot"></span>
-            <span id="modelName">claude-opus-4-8</span>
+          <div class="model-dropdown" id="modelDropdown">
+            <div class="model-badge" id="modelBadge">
+              <span class="model-badge-dot"></span>
+              <span id="modelName">claude-opus-4-8</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            <div class="model-menu" id="modelMenu">
+              <div class="model-option" data-model="claude-opus-4-8">
+                <span class="check">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>claude-opus-4-8</span>
+              </div>
+              <div class="model-option" data-model="claude-opus-4-7">
+                <span class="check">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>claude-opus-4-7</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1414,6 +1509,9 @@ Always respond helpfully and with expertise.`;
     const apiKeyInput = document.getElementById('apiKeyInput');
     const modelInput = document.getElementById('modelInput');
     const modelNameEl = document.getElementById('modelName');
+    const modelDropdown = document.getElementById('modelDropdown');
+    const modelBadge = document.getElementById('modelBadge');
+    const modelMenu = document.getElementById('modelMenu');
     const toast = document.getElementById('toast');
     const toastText = document.getElementById('toastText');
 
@@ -1435,11 +1533,19 @@ Always respond helpfully and with expertise.`;
       apiKeyInput.value = config.apiKey;
       modelInput.value = config.model;
       modelNameEl.textContent = config.model;
+      syncModelMenu();
     }
 
     function saveConfig() {
       localStorage.setItem('claudia_config', JSON.stringify(config));
       modelNameEl.textContent = config.model;
+      syncModelMenu();
+    }
+
+    function syncModelMenu() {
+      document.querySelectorAll('.model-option').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.model === config.model);
+      });
     }
 
     function loadConversations() {
@@ -2014,6 +2120,28 @@ Always respond helpfully and with expertise.`;
       });
 
       newChatBtn.addEventListener('click', createNewChat);
+
+      // Model dropdown
+      modelBadge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        modelDropdown.classList.toggle('open');
+      });
+
+      document.querySelectorAll('.model-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          config.model = opt.dataset.model;
+          modelInput.value = config.model;
+          saveConfig();
+          modelDropdown.classList.remove('open');
+          showToast(`Switched to ${config.model}`);
+        });
+      });
+
+      document.addEventListener('click', () => {
+        modelDropdown.classList.remove('open');
+      });
+
+      modelMenu.addEventListener('click', (e) => e.stopPropagation());
 
       attachBtn.addEventListener('click', () => fileInput.click());
 
